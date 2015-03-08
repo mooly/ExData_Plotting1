@@ -1,0 +1,53 @@
+# This script creates a histogram plot from household power consumption data
+# collected by University of California Irvine (UCI).
+# 
+# Original data description, info and download location: 
+#     https://archive.ics.uci.edu/ml/datasets/Individual+household+electric+power+consumption
+# 
+# Script created for Coursera: Exploratory Data Analysis from JHU
+
+# Download and unzip data file into working directory:
+# fileURL0 <- "https://archive.ics.uci.edu/ml/machine-learning-databases/00235/household_power_consumption.zip"
+fileURL <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2Fhousehold_power_consumption.zip"
+dateDownloaded <- date()
+download.file(fileURL, destfile="./HPC.zip", method="curl")
+unzip("./HPC.zip")
+datafile <- "household_power_consumption.txt"
+
+# [Optional] Detect column classes, for use as 'colClasses' parameter:
+# initial <- read.table(datafile, header=TRUE, sep=";", nrows = 100)
+# classes <- sapply(initial, class)
+
+# Read datafile into data frame variable:
+powerdata <- read.table(datafile, header=TRUE, sep=";", colClasses="character")
+
+# Reclassify "Date" column, specify two dates of interest:
+powerdata$Date <- strptime(powerdata$Date,"%d/%m/%Y")
+dayone <- strptime("2007-02-01","%Y-%m-%d") # ?OR? as.Date("2007-02-01")
+daytwo <- strptime("2007-02-02","%Y-%m-%d")
+
+# Subset data and reclassify data columns to numeric:
+powerdata <- powerdata[powerdata$Date == dayone | powerdata$Date == daytwo,];
+for (i in 3:9) { powerdata[,i]<-as.numeric(powerdata[,i]) }
+
+# Concatenate "Date" and "Time" columns, reclassify, add to data frame:
+powerdata$DateTime <- do.call(paste,c(powerdata[c("Date","Time")],sep=" "))
+powerdata$DateTime <- strptime(powerdata$DateTime,"%Y-%m-%d %H:%M:%S")
+
+# Create PNG file with line plot:
+png(filename="plot4.png", width=480, height=480, units="px")
+par(mfcol=c(2,2)) # multiple plots entered down columns vs. along rows, i.e. mfrow
+with(powerdata,plot(DateTime,Global_active_power, type="l",main="",
+                    ylab="Global Active Power",xlab=""))
+with(powerdata,{
+    plot(DateTime,Sub_metering_1,type="l",ylab="Energy Sub metering",xlab="",main="")
+    lines(DateTime,Sub_metering_2,col="red")
+    lines(DateTime,Sub_metering_3,col="blue")
+    legend("topright",lty=1,col=c("black","red","blue"),bty="n",
+           legend=c("Sub_metering_1","Sub_metering_2","Sub_metering_3"))
+    })
+with(powerdata,plot(DateTime,Voltage, type="l",main="",
+                    ylab="Voltage",xlab="datetime"))
+with(powerdata,plot(DateTime,Global_reactive_power, type="l",main="",
+                    xlab="datetime"))
+dev.off()
