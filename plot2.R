@@ -4,7 +4,11 @@
 # Original data description, info and download location: 
 #     https://archive.ics.uci.edu/ml/datasets/Individual+household+electric+power+consumption
 # 
+# Note: Data requires approx. 145MB of memory when read in by R
+#
 # Script created for Coursera: Exploratory Data Analysis from JHU
+# To run, place script in working directory, then execute statement in console:
+#    > source('./plot2.R')
 
 # Download and unzip data file into working directory:
 # fileURL0 <- "https://archive.ics.uci.edu/ml/machine-learning-databases/00235/household_power_consumption.zip"
